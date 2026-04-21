@@ -63,7 +63,12 @@ class CleanUpTask implements TaskInterface
 
     protected function remove(Carbon $minimumModifiedDelta, StorageAttributes $file): void
     {
-        if (!$minimumModifiedDelta->greaterThan(Carbon::createFromTimestamp($file->lastModified()))) {
+        $lastModified = $file->lastModified();
+        if ($lastModified === null) {
+            return;
+        }
+
+        if (!$minimumModifiedDelta->greaterThan(Carbon::createFromTimestamp($lastModified))) {
             return;
         }
 
