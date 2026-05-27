@@ -13,13 +13,12 @@
 
 namespace FormBuilderBundle\Tool;
 
-use Pimcore\Localization\LocaleServiceInterface;
+use Pimcore\Tool;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class LocaleDataMapper
 {
     public function __construct(
-        private readonly LocaleServiceInterface $localeService,
         #[Autowire('%pimcore.translations.default_locale%')]
         private readonly ?string $defaultLocale = null
     ) {
@@ -33,7 +32,7 @@ class LocaleDataMapper
         }
 
         // search for fallback locale
-        $fallbackLanguages = $this->localeService->getFallbackLanguages($locale);
+        $fallbackLanguages = Tool::getFallbackLanguagesFor($locale);
         foreach ($fallbackLanguages as $fallbackLanguage) {
             if (isset($data[$fallbackLanguage]) && !empty($data[$fallbackLanguage]['id'])) {
                 return $data[$fallbackLanguage]['id'];
@@ -66,7 +65,7 @@ class LocaleDataMapper
         }
 
         // search for fallback locale
-        $fallbackLanguages = $this->localeService->getFallbackLanguages($requestedLocale);
+        $fallbackLanguages = Tool::getFallbackLanguagesFor($requestedLocale);
         foreach ($fallbackLanguages as $fallbackLanguage) {
             if ($blockGenerator($fallbackLanguage) === true) {
                 return $data[$fallbackLanguage];
