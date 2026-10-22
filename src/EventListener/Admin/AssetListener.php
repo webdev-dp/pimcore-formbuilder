@@ -17,6 +17,13 @@ use Pimcore\Event\BundleManager\PathsEvent;
 use Pimcore\Event\BundleManagerEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Registers the Classic Admin (ExtJS) form editor assets.
+ *
+ * Only active when the Classic Admin (pimcore/admin-ui-classic-bundle) is installed, i.e. on Pimcore 12.3 / Platform 2025.4.
+ * On Platform 2026 the Classic Admin is gone and the editor is delivered through the Studio UI bundle
+ * (see FormBuilderBundle\Webpack\WebpackEntryPointProvider).
+ */
 class AssetListener implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
@@ -31,6 +38,10 @@ class AssetListener implements EventSubscriberInterface
 
     public function addCssFiles(PathsEvent $event): void
     {
+        if (!$this->isClassicAdminInstalled()) {
+            return;
+        }
+
         $event->addPaths([
             '/bundles/formbuilder/css/admin.css'
         ]);
@@ -38,6 +49,10 @@ class AssetListener implements EventSubscriberInterface
 
     public function addEditModeCssFiles(PathsEvent $event): void
     {
+        if (!$this->isClassicAdminInstalled()) {
+            return;
+        }
+
         $event->addPaths([
             '/bundles/formbuilder/css/admin-editmode.css',
         ]);
@@ -45,6 +60,10 @@ class AssetListener implements EventSubscriberInterface
 
     public function addJsFiles(PathsEvent $event): void
     {
+        if (!$this->isClassicAdminInstalled()) {
+            return;
+        }
+
         $event->addPaths([
             '/bundles/formbuilder/js/extjs/plugin.js',
             '/bundles/formbuilder/js/extjs/settings.js',
@@ -118,8 +137,17 @@ class AssetListener implements EventSubscriberInterface
 
     public function addEditModeJsFiles(PathsEvent $event): void
     {
+        if (!$this->isClassicAdminInstalled()) {
+            return;
+        }
+
         $event->addPaths([
             '/bundles/formbuilder/js/admin/area.js'
         ]);
+    }
+
+    private function isClassicAdminInstalled(): bool
+    {
+        return class_exists('Pimcore\\Bundle\\AdminBundle\\PimcoreAdminBundle');
     }
 }
